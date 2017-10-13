@@ -1,0 +1,44 @@
+/app:              程序中的主要逻辑代码都在这里了,主要包括controllers和error
+/app/controllers:  api逻辑代码实现, 以[功能_controller]命名. 内部实现api功能
+/app/error:        此处自定义了api异常,其中ApiError.js不需要动.
+                   ApiErrorName.js用于指定一些错误信息.
+/bin:              不用管,只需要知道这是启动文件就可以了(其实就是个.js文件/doge)
+/config:           这里只放配置信息,不是配置信息别放进来
+                   目前有development环境,test环境,log4js配置信息,后面redis也应该配置到这里
+/logs:             日志输出位置,不需要管
+/middlewares:      中间件存放目录.目前response_formatter.js用于统一api返回的内容结构
+/node_modules:     依赖模块文件夹,不需要管
+/public:           静态文件,目前我们只做api,不需要管，无视
+/routes:           路由存放目录.里面存放对应views的controller
+/routes/api:       所有api对应的逻辑的controller都放到这里. 跟routes区分开来
+/utils:            操作组件存放库，目前只放了写日志的utils
+/views:            目前只做api,无视views
+
+
+运行程序
+1、打开cmd, 进入到此目录中. cd xxxxxxx
+2、输入npm install回车下载依赖组件
+3、输入npm start 运行程序
+4、在浏览器中访问 http://localhost:3001/api/users/getUser?id=2
+
+基本api开发流程 (以查询工厂为例)
+1、\app\controllers中 新建  factory_controller.js
+
+   exports.getFactory = async (ctx, next) => {
+      ctx.body = { name: "GEK" };
+   }
+
+2、\routes\api中 新建factory_api.js
+  
+   var router = require('koa-router')();
+   var factory_controller = require('../../app/controllers/factory_controller');
+   router.get('/getFactory', factory_controller.getFactory);
+
+   module.exports = router;
+
+3、打开\routes\api\index.js 添加以下代码来区分api功能路径
+   
+   var factory_api = require('./factory_api');
+   router.use('/factory', factory_api.routes(), factory_api.allowedMethods());
+
+4、浏览器访问http://localhost:3001/api/factory/getFactory
